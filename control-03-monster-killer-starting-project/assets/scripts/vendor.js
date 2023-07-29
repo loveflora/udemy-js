@@ -7,6 +7,8 @@ const strongAttackBtn = document.getElementById('strong-attack-btn');
 const healBtn = document.getElementById('heal-btn');
 const logBtn = document.getElementById('log-btn');
 
+const h2 = document.getElementsByTagName('h2')[1];
+
 function adjustHealthBars(maxLife) {
   monsterHealthBar.max = maxLife;
   monsterHealthBar.value = maxLife;
@@ -36,7 +38,16 @@ function resetGame(value) {
 }
 
 function removeBonusLife() {
-  bonusLifeEl.parentNode.removeChild(bonusLifeEl);
+  document.getElementById('bonus-life').remove();
+}
+
+function addBonusLife() {
+  if (!document.getElementById('bonus-life')) {
+    const bonusLife = document.createElement('span');
+    bonusLife.id = 'bonus-life';
+    bonusLife.innerHTML = '1';
+    h2.appendChild(bonusLife);
+  }
 }
 
 function setPlayerHealth(health) {
