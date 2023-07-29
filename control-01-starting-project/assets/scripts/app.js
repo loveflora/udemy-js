@@ -33,7 +33,16 @@ function calculateResult(calculationType) {
   const enteredNumber = getUserNumberInput();
   const initialResult = currentResult;
   let mathOperator;
-  if (calculationType === 'ADD') {
+  if (
+    (calculationType !== 'ADD' &&
+      calculationType !== 'SUBTRACT' &&
+      calculationType !== 'MULTIPLY' &&
+      calculationType !== 'DIVIDE') ||
+    // 0을 입력할 경우
+    !enteredNumber //. !0 === true 라서 return 종료됨) {
+  ) {
+    return;
+  } else if (calculationType === 'ADD') {
     currentResult += enteredNumber;
     mathOperator = '+';
   } else if (calculationType === 'SUBTRACT') {
