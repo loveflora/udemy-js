@@ -1,18 +1,82 @@
-// 전역 값 : 대문자 처리
-// 최대 공격력
-const ATTACK_VALUE = 10;
+//* 전역 정적 값 : 대문자 처리
+const ATTACK_VALUE = 10; // 최대 공격력
 const STRONG_ATTACK_VALUE = 17;
 const MONSTER_ATTACK_VALUE = 14;
 const HEAL_VALUE = 20;
 
+// 전역 상수 식별자 (문자열로 오타내 확률 적어짐)
+const MODE_ATTACK = 'ATTACK'; // MODE_ATTACK = 0
+const MODE_STRONG_ATTACK = 'STRONG_ATTACK'; // MODE_STRONG_ATTACK = 1
+const LOG_EVENT_PLAYER_ATTACK = 'PLAYER_ATTACK';
+const LOG_EVENT_PLAYER_STRONG_ATTACK = 'PLAYER_STRONG_ATTACK';
+const LOG_EVENT_MONSTER_ATTACK = 'MONSTER_ATTACK';
+const LOG_EVENT_PLAYER_HEAL = 'PLAYER_HEAL';
+const LOG_EVENT_GAME_OVER = 'GAME_OVER';
+
+// prompt : 문자열
+const enteredValue = prompt('Maximum life for you and the monster.', '100');
+
 // 사용자가 설정가능
-let chosenMaxLife = 100;
+let chosenMaxLife = parseInt(enteredValue);
+
+let battleLog = [];
+
+if (isNaN(chosenMaxLife) || chosenMaxLife <= 0) {
+  chosenMaxLife = 100;
+}
+
 let currentMonsterHealth = chosenMaxLife;
 let currentPlayerHealth = chosenMaxLife;
 // boolean 값 나타내는 경우에는 동사 사용 (has, is ...)
 let hasBonusLife = true;
 
 adjustHealthBars(chosenMaxLife);
+
+//=== 함수 정의 ===
+function writeToLog(ev, val, monsterHealth, playerHealth) {
+  let logEntry;
+  if (ev === LOG_EVENT_PLAYER_ATTACK) {
+    logEntry = {
+      event: ev,
+      value: val,
+      target: 'MONSTER',
+      finalMonsterHealth: monsterHealth,
+      finalPlayerHealth: playerHealth,
+    };
+  } else if (ev === LOG_EVENT_PLAYER_STRONG_ATTACK) {
+    logEntry = {
+      event: ev,
+      value: val,
+      target: 'MONSTER',
+      finalMonsterHealth: monsterHealth,
+      finalPlayerHealth: playerHealth,
+    };
+  } else if (ev === LOG_EVENT_MONSTER_ATTACK) {
+    logEntry = {
+      event: ev,
+      value: val,
+      target: 'PLAYER',
+      finalMonsterHealth: monsterHealth,
+      finalPlayerHealth: playerHealth,
+    };
+  } else if (ev === LOG_EVENT_PLAYER_HEAL) {
+    logEntry = {
+      event: ev,
+      value: val,
+      target: 'PLAYER',
+      finalMonsterHealth: monsterHealth,
+      finalPlayerHealth: playerHealth,
+    };
+  } else if (ev === LOG_EVENT_GAME_OVER) {
+    logEntry = {
+      event: ev,
+      value: val,
+      finalMonsterHealth: monsterHealth,
+      finalPlayerHealth: playerHealth,
+    };
+  }
+  battleLog.push(logEntry);
+}
 
 function reset() {
   hasBonusLife = true;
@@ -27,6 +91,12 @@ function endRound() {
   const initialPlayerHealth = currentPlayerHealth;
   const playerDamage = dealPlayerDamage(MONSTER_ATTACK_VALUE);
   currentPlayerHealth -= playerDamage;
+  writeToLog(
+    LOG_EVENT_MONSTER_ATTACK,
+    playerDamage,
+    currentMonsterHealth,
+    currentPlayerHealth
+  );
 
   //++ BonusLife
   if (currentPlayerHealth <= 0 && hasBonusLife) {
@@ -39,10 +109,28 @@ function endRound() {
 
   if (currentMonsterHealth <= 0 && currentPlayerHealth > 0) {
     alert('You won!');
+    writeToLog(
+      LOG_EVENT_GAME_OVER,
+      'PLAYER WON',
+      currentMonsterHealth,
+      currentPlayerHealth
+    );
   } else if (currentPlayerHealth <= 0 && currentMonsterHealth > 0) {
     alert('You lost!');
+    writeToLog(
+      LOG_EVENT_GAME_OVER,
+      'MONSTER LOST',
+      currentMonsterHealth,
+      currentPlayerHealth
+    );
   } else if (currentPlayerHealth <= 0 && currentMonsterHealth <= 0) {
     alert('You have a draw!');
+    writeToLog(
+      LOG_EVENT_GAME_OVER,
+      'A DRAW',
+      currentMonsterHealth,
+      currentPlayerHealth
+    );
   }
 
   if (currentMonsterHealth <= 0 || currentPlayerHealth <= 0) {
@@ -51,26 +139,37 @@ function endRound() {
 }
 
 function attackMonster(mode) {
-  let maxDamage;
-  if (mode === 'ATTACK') {
-    maxDamage = ATTACK_VALUE;
-  } else if (mode === 'STRONG_ATTACK') {
-    maxDamage = STRONG_ATTACK_VALUE;
-  }
+  //_ 삼항 연산자 사용
+  const maxDamage = mode === MODE_ATTACK ? ATTACK_VALUE : STRONG_ATTACK_VALUE;
+  const logEvent =
+    mode === MODE_ATTACK
+      ? LOG_EVENT_PLAYER_ATTACK
+      : LOG_EVENT_PLAYER_STRONG_ATTACK;
+
+  // let maxDamage;
+  // let logEvent;
+  // if (mode === MODE_ATTACK) {
+  //   maxDamage = ATTACK_VALUE;
+  //   logEvent = LOG_EVENT_PLAYER_ATTACK;
+  // } else if (mode === MODE_STRONG_ATTACK) {
+  //   maxDamage = STRONG_ATTACK_VALUE;
+  //   logEvent = LOG_EVENT_PLAYER_STRONG_ATTACK;
+  // }
 
   // 함수 스코프 내에서는 (함수가 실행되는 도중에는) 바뀌지 않으므로 상수 const
   const damage = dealMonsterDamage(maxDamage);
   currentMonsterHealth -= damage;
+  writeToLog(logEvent, damage, currentMonsterHealth, currentPlayerHealth);
   endRound();
 }
 
 // 보통 addEventListener 와 같은 이벤트 핸들러에 연결되는 경우, Handler 많이 붙임
 function attackHandler() {
-  attackMonster('ATTACK');
+  attackMonster(MODE_ATTACK);
 }
 
 function strongAttackHandler() {
-  attackMonster('STRONG_ATTACK');
+  attackMonster(MODE_STRONG_ATTACK);
 }
 
 function healPlayerHandler() {
@@ -89,11 +188,22 @@ function healPlayerHandler() {
 
   // 체력바 실제 업데이트
   currentPlayerHealth += healValue;
+  writeToLog(
+    LOG_EVENT_PLAYER_HEAL,
+    healValue,
+    currentMonsterHealth,
+    currentPlayerHealth
+  );
   endRound();
 
   console.log(healValue);
 }
 
+function printLogHandler() {
+  console.log(battleLog);
+}
+
 attackBtn.addEventListener('click', attackHandler);
 strongAttackBtn.addEventListener('click', strongAttackHandler);
 healBtn.addEventListener('click', healPlayerHandler);
+logBtn.addEventListener('click', printLogHandler);
