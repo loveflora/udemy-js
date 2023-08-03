@@ -13,17 +13,52 @@ const LOG_EVENT_MONSTER_ATTACK = 'MONSTER_ATTACK';
 const LOG_EVENT_PLAYER_HEAL = 'PLAYER_HEAL';
 const LOG_EVENT_GAME_OVER = 'GAME_OVER';
 
-// prompt : 문자열
-const enteredValue = prompt('Maximum life for you and the monster.', '100');
-
-// 사용자가 설정가능
-let chosenMaxLife = parseInt(enteredValue);
-
 let battleLog = [];
 
-if (isNaN(chosenMaxLife) || chosenMaxLife <= 0) {
-  chosenMaxLife = 100;
+//=== 'Try-catch' 사용해 오류 잡고 처리하기 ===
+// 오류 발생 여부를 제어할 수 없을 경우 사용
+// (사용자 입력값 오류는 제어할 수 없으므로, try-catch 사용)
+function getMaxLifeValues() {
+  // prompt : 문자열
+  const enteredValue = prompt('Maximum life for you and the monster.', '100');
+
+  // 사용자가 설정가능
+  let parsedValue = Number(enteredValue);
+  //\ parseInt() : 숫자, 문자 중에서 '숫자'만 인식하여 return (하지만 문자가 앞에 있는 경우는 불가)
+  //\ Number() : 무조건 숫자로 이루어진 것만 숫자로 return, 소수점도 인식
+  // 유효하지 않은 값 입력 시
+  if (isNaN(parsedValue) || parsedValue <= 0) {
+    //++ throw
+    // 콘솔창에 시스템 오류메세지
+    // 아예 작동 X
+    throw { message: 'invalid user input, not a number !' };
+  }
+  console.log(parsedValue);
+  return parsedValue;
 }
+
+let chosenMaxLife;
+
+try {
+  //++ try
+  //_ 오류 발생시킬 수 있는 코드
+  chosenMaxLife = getMaxLifeValues();
+} catch (error) {
+  //++ catch
+  //_ fallback (실패했을 때 실행할 코드. 예외처리)
+  //_ 자체 오류처리 로직 사용
+  // 시스템 오류가 아닌 일반적인 로그 메세지 뜸.
+  // 작동 O
+  console.log(error);
+  chosenMaxLife = 100;
+  alert('You entered something wrong, default value of 100 was used.');
+  //,, throw error (오류 재발생, 자체 분석 서버로 오류를 보내서 기록)
+}
+//++ finally
+// 오류가 있든 없든 항상 실행 (try-catch 내부에서 오류 발생시켜도, finally는 실행됨)
+// try-catch 내부에서 오류가 또 발생할 수 있음
+// try-catch 내부에서 오류 발생시키면 이후의 코드는 실행 안되고, finally 내부 코드만 실행됨.
+// 완벽한 fallback이 없을 경우, finally 사용 (클린업 작업)
 
 let currentMonsterHealth = chosenMaxLife;
 let currentPlayerHealth = chosenMaxLife;
