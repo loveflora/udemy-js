@@ -13,8 +13,35 @@ const userInputs = addMovieModal.querySelectorAll("input");
 
 //< 저장
 const movies = [];
+const entryTextSection = document.getElementById("entry-text");
 
 //] function
+const updateUI = () => {
+  if (movies.length === 0) {
+    // 비어 있다면
+    entryTextSection.style.display = "block";
+  } else {
+    entryTextSection.style.display = "none";
+  }
+};
+
+const renderNewMovieElement = (title, imgURL, rating) => {
+  const newMovieElement = document.createElement("li");
+  newMovieElement.className = "movie-element";
+  newMovieElement.innerHTML = `
+   <div class="movie-element__image">
+    <img src="${imgURL}" alt="${title}">
+   </div>
+   <div class="movie-element__info">
+    <h2>${title}</h2>
+    <p>${rating}/5 stars</p>
+   </div>
+  `;
+
+  const listRoot = document.getElementById("movie-list");
+  listRoot.append(newMovieElement);
+};
+
 const toggleBackdrop = () => {
   backdrop.classList.toggle("visible");
 };
@@ -65,6 +92,8 @@ const addMovieHandler = () => {
   console.log(newMovie);
   toggleMovieModal();
   clearMovieInput();
+  renderNewMovieElement(newMovie.title, newMovie.image, newMovie.rating);
+  updateUI();
 };
 
 // eventListener 버튼 클릭해야 호출되는 함수는 handler 붙이기
