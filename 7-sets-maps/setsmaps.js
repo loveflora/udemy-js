@@ -35,3 +35,21 @@ for (const value of personData.values()) {
 }
 
 console.log(personData.size);
+
+// === WeakSet() ===
+let person = { name: "Max" };
+const persons = new WeakSet();
+persons.add(person);
+
+// ... some operations
+// person = null;
+
+console.log(persons);
+
+// === WeakMap() ===
+const personData2 = new WeakMap();
+personData2.set(person, "Extra info!");
+
+person = null;
+
+console.log(personData2);
