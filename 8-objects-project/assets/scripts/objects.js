@@ -1,20 +1,20 @@
-const addMovieBtn = document.getElementById('add-movie-btn');
-const searchBtn = document.getElementById('search-btn');
+const addMovieBtn = document.getElementById("add-movie-btn");
+const searchBtn = document.getElementById("search-btn");
 
 const movies = [];
 
 // (filter = '') : 특정한 값이 전달되지 않았을 경우에는 빈 문자열이 기본값
-const renderMovies = (filter = '') => {
-  const movieList = document.getElementById('movie-list');
+const renderMovies = (filter = "") => {
+  const movieList = document.getElementById("movie-list");
 
   if (movies.length === 0) {
-    movieList.classList.remove('visible');
+    movieList.classList.remove("visible");
     return;
   } else {
-    movieList.classList.add('visible');
+    movieList.classList.add("visible");
   }
 
-  movieList.innerHTML = '';
+  movieList.innerHTML = "";
 
   //++ 검색 기능
   const filteredMovies = !filter
@@ -23,7 +23,7 @@ const renderMovies = (filter = '') => {
   // 검색어
 
   filteredMovies.forEach((movie) => {
-    const movieEl = document.createElement('li');
+    const movieEl = document.createElement("li");
 
     //; 객체 구조분해
     // 순서는 상관 없고, key값과 변수명이 일치해야 함
@@ -46,12 +46,15 @@ const renderMovies = (filter = '') => {
 
     // const { getFormattedTitle } = movie;
 
-    let text = getFormattedTitle() + ' - ';
+    //; apply 함수 사용
+    // 함수를 바로 실행
+    // 함수.apply(this인자1, 인자2, 인자3 …)
+    let text = getFormattedTitle.apply(movie) + " - ";
 
     // 프로퍼티 변경
     for (const key in info) {
       // key명은 자동으로 문자열로 형 변환됨
-      if (key !== 'title') {
+      if (key !== "title" && key !== "_title") {
         // 동적으로 접근
         text = text + `${key}: ${info[key]}`;
       }
@@ -62,21 +65,31 @@ const renderMovies = (filter = '') => {
 };
 
 const addMovieHandler = () => {
-  const title = document.getElementById('title').value;
-  const extraName = document.getElementById('extra-name').value;
-  const extraValue = document.getElementById('extra-value').value;
+  const title = document.getElementById("title").value;
+  const extraName = document.getElementById("extra-name").value;
+  const extraValue = document.getElementById("extra-value").value;
 
   if (
-    title.trim() === '' ||
-    extraName.trim() === '' ||
-    extraValue.trim() === ''
+    title.trim() === "" ||
+    extraName.trim() === "" ||
+    extraValue.trim() === ""
   ) {
     return;
   }
 
   const newMovie = {
     info: {
-      title, // { title: title값 }
+      set title(val) {
+        if (val.trim() === "") {
+          this._title = "DEFAULT";
+          return;
+        }
+        this._title = val;
+      },
+      // title, // { title: title값 }
+      get title() {
+        return this._title;
+      },
       [extraName]: extraValue,
     },
     id: Math.random().toString(),
@@ -86,18 +99,26 @@ const addMovieHandler = () => {
     //   return this.info.title.toUpperCase();
     // },
     getFormattedTitle() {
+      console.log(this);
       return this.info.title.toUpperCase();
     },
   };
+
+  newMovie.info.title = title;
+  console.log(newMovie.info.title);
 
   movies.push(newMovie);
   renderMovies();
 };
 
-const searchMovieHandler = () => {
-  const filterTerm = document.getElementById('filter-title').value;
+const searchMovieHandler = function () {
+  // 이벤트를 바인딩하면서 간접적으로 실행
+  // 브라우저는 이벤트 리스너에서 이벤트를 트리거하는 DOM요소에 this를 바인딩
+  // 화살표 함수에선 실행 X !
+  console.log(this);
+  const filterTerm = document.getElementById("filter-title").value;
   renderMovies(filterTerm);
 };
 
-addMovieBtn.addEventListener('click', addMovieHandler);
-searchBtn.addEventListener('click', searchMovieHandler);
+addMovieBtn.addEventListener("click", addMovieHandler);
+searchBtn.addEventListener("click", searchMovieHandler);
