@@ -45,6 +45,7 @@ setTimeout(() => {
 const form = document.querySelector("form");
 
 form.addEventListener("submit", (event) => {
+  //
   event.preventDefault();
   console.log(event);
 });
@@ -52,15 +53,34 @@ form.addEventListener("submit", (event) => {
 const div = document.querySelector("div");
 
 div.addEventListener("mouseenter", (event) => {
-  console.log("CLICKED DIV");
+  console.log("DIV");
   console.log(event);
 });
 
+div.addEventListener(
+  "click",
+  (event) => {
+    console.log("CLICKED DIV");
+    console.log(event);
+  },
+  true,
+);
+
 button.addEventListener("click", function (event) {
-  event.stopPropagation();
+  //] event 전파 방지
+  //; event.stopPropagation();
+
+  // event.stopImmediatePropagation();
+  //  - 첫 번째 이벤트 리스너의 다음에 있는 버튼 리스너
+  //    같은 요소에 있는 다른 리스너는 더이상 실행 안됨
+
   console.log("CLICKED BUTTON");
   console.log(event);
-  console.log(this);
+
+  //] this
+  //-- e.target (이벤트의 현재 대상)
+  console.log(this); // button 태그
+  // 화살표함수였다면 당연히 window 찍혔겠죠 ?
 });
 
 const listItems = document.querySelectorAll("li");
@@ -74,9 +94,22 @@ const list = document.querySelector("ul");
 
 list.addEventListener("click", function (event) {
   // console.log(event.currentTarget);
+
+  // 이렇게 하면
+  // li > h2 > p
+  // 각각 따로 먹음
   // event.target.classList.toggle('highlight');
+
+  //] 이벤트 위임 패턴
+  //; closest() 사용
+  // 한 번에 먹음
+  //-- 가장 가까운 li 태그를 반환
   event.target.closest("li").classList.toggle("highlight");
+
+  // 모든 DOM 요소에 존재하는 메소드
+  // .submit() : 프로그래밍을 통해 트리거할 경우, submit 이벤트리스너는 건너뜀
+  //'' 315. 프로그래밍적으로 DOM 요소 트리거하기
   // form.submit();
-  button.click();
-  console.log(this);
+  button.click(); // 이벤트리스너 실행됨
+  console.log(this); // ul
 });
