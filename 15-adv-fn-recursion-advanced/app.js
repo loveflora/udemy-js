@@ -43,6 +43,7 @@ function printHobbies(h) {
 printHobbies(hobbies);
 
 //] 팩토리 함수
+//] 클로저
 let multiplier = 1.1;
 
 function createTaxCalculator(tax) {
@@ -64,6 +65,7 @@ console.log(calculateVatAmount(200));
 
 let userName = "Max";
 
+//] 클로저
 function greetUser() {
   // let name = 'Anna';
   console.log("Hi " + name);
@@ -75,6 +77,8 @@ userName = "Manuel";
 
 greetUser();
 
+//] 재귀 함수
+//-- for문
 // function powerOf(x, n) {
 //   let result = 1;
 
@@ -85,8 +89,9 @@ greetUser();
 //   return result;
 // }
 
+//-- 재귀 함수 !
 function powerOf(x, n) {
-  // if (n === 1) {
+  // if (n === 1) {  //) 종결문
   //   return x;
   // }
   // return x * powerOf(x, n - 1);
@@ -96,6 +101,8 @@ function powerOf(x, n) {
 
 console.log(powerOf(2, 3)); // 2 * 2 * 2
 
+//] 고급 재귀 함수
+// for문으로 불가
 const myself = {
   name: "Max",
   friends: [
@@ -121,9 +128,11 @@ const myself = {
   ],
 };
 
+// 재귀 함수
 function getFriendNames(person) {
   const collectedNames = [];
 
+  // friends 프로퍼티 없을 경우
   if (!person.friends) {
     return [];
   }
@@ -137,3 +146,4 @@ function getFriendNames(person) {
 }
 
 console.log(getFriendNames(myself));
+// ['Manuel', 'Chris', 'Hari', 'Amilia', 'Julia']
