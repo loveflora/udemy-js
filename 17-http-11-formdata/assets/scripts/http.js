@@ -70,7 +70,7 @@ async function fetchPosts() {
     const postEl = document.importNode(postTemplate.content, true); // 깊은 복사
     postEl.querySelector('h2').textContent = post.title.toUpperCase();
     postEl.querySelector('p').textContent = post.body;
-    postEl.querySelector('li').id = post.id;
+    postEl.querySelector('li').id = post.id; // 모든 list item 요소에 id 할당
     listElement.append(postEl);
   }
 }
@@ -100,7 +100,7 @@ form.addEventListener('submit', (event) => {
   const enteredTitle = event.currentTarget.querySelector('#title').value;
   const enteredContent = event.currentTarget.querySelector('#content').value;
 
-  createPost(enteredTitle, enteredContent);
+  createPost(enteredTitle, enteredContent); // 게시물 추가
 
   //-- createPost('DUMMY', 'A dummy post !');
   //\ 200 : 요청 성공
