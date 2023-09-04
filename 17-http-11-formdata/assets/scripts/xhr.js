@@ -1,10 +1,10 @@
-//=== http 요청 보내기 ===
+//=== http 요청 보내기 : XMLHttpRequest ===
 
-const listElement = document.querySelector('.posts');
-const postTemplate = document.getElementById('single-post');
-const form = document.querySelector('#new-post form');
-const fetchButton = document.querySelector('#available-posts button');
-const postList = document.querySelector('ul');
+const listElement = document.querySelector(".posts");
+const postTemplate = document.getElementById("single-post");
+const form = document.querySelector("#new-post form");
+const fetchButton = document.querySelector("#available-posts button");
+const postList = document.querySelector("ul");
 
 //; HTTP 요청 프로미스화하기
 //++ 요청 보내기
@@ -22,7 +22,7 @@ function sendHttpRequest(method, url, data) {
     xhr.open(method, url);
     //  xhr 객체에 url 주소로 GET 요청을 보냄
 
-    xhr.responseType = 'json';
+    xhr.responseType = "json";
     // JSON.parse(xhr.response)와 동일
 
     // load event
@@ -31,6 +31,20 @@ function sendHttpRequest(method, url, data) {
     // 이벤트 핸들러에 함수를 할당 (addEventListener)
     xhr.onload = function () {
       resolve(xhr.response);
+    };
+
+    //; error
+    xhr.onload = function () {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(xhr.response);
+      } else {
+        xhr.response;
+        reject(new Error("Something went wrong!"));
+      }
+    };
+
+    xhr.onerror = function () {
+      reject(new Error("Failed to send request!"));
     };
 
     //; 요청을 전송
@@ -45,8 +59,8 @@ function sendHttpRequest(method, url, data) {
 
 async function fetchPosts() {
   const responseData = await sendHttpRequest(
-    'GET',
-    'https://jsonplaceholder.typicode.com/posts'
+    "GET",
+    "https://jsonplaceholder.typicode.com/posts",
   );
 
   //-- 1) 서버에서 페칭된 JSON 데이터
@@ -68,9 +82,9 @@ async function fetchPosts() {
   //  모든 게시물마다 각 템플릿을 복제하여 listElement에 추가
   for (const post of listOfPosts) {
     const postEl = document.importNode(postTemplate.content, true); // 깊은 복사
-    postEl.querySelector('h2').textContent = post.title.toUpperCase();
-    postEl.querySelector('p').textContent = post.body;
-    postEl.querySelector('li').id = post.id; // 모든 list item 요소에 id 할당
+    postEl.querySelector("h2").textContent = post.title.toUpperCase();
+    postEl.querySelector("p").textContent = post.body;
+    postEl.querySelector("li").id = post.id; // 모든 list item 요소에 id 할당
     listElement.append(postEl);
   }
 }
@@ -85,20 +99,20 @@ async function createPost(title, content) {
   };
 
   // POST : 생성하고자 하는 데이터를 나가는 요청에 추가해야 함
-  sendHttpRequest('POST', 'https://jsonplaceholder.typicode.com/posts', post);
+  sendHttpRequest("POST", "https://jsonplaceholder.typicode.com/posts", post);
   // function sendHttpRequest(method, url, data) {}
 }
 
 //++ 클릭 이벤트
-fetchButton.addEventListener('click', fetchPosts);
+fetchButton.addEventListener("click", fetchPosts);
 
 // UI를 통해 요청 trigger하기
 // 'ADD' 버튼 누르면 아래 코드 수행
-form.addEventListener('submit', (event) => {
+form.addEventListener("submit", (event) => {
   event.preventDefault(); // 브라우저가 form 제출하지 않음.
 
-  const enteredTitle = event.currentTarget.querySelector('#title').value;
-  const enteredContent = event.currentTarget.querySelector('#content').value;
+  const enteredTitle = event.currentTarget.querySelector("#title").value;
+  const enteredContent = event.currentTarget.querySelector("#content").value;
 
   createPost(enteredTitle, enteredContent); // 게시물 추가
 
@@ -112,12 +126,12 @@ form.addEventListener('submit', (event) => {
   // userId: 0.7275782649083105
 });
 
-postList.addEventListener('click', (event) => {
-  if (event.target.tagName === 'BUTTON') {
-    const postId = event.target.closest('li').id;
+postList.addEventListener("click", (event) => {
+  if (event.target.tagName === "BUTTON") {
+    const postId = event.target.closest("li").id;
     sendHttpRequest(
-      'DELETE',
-      `https://jsonplaceholder.typicode.com/posts/${postId}`
+      "DELETE",
+      `https://jsonplaceholder.typicode.com/posts/${postId}`,
     );
   }
 });

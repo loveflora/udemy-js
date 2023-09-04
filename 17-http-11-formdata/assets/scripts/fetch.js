@@ -1,8 +1,10 @@
-const listElement = document.querySelector('.posts');
-const postTemplate = document.getElementById('single-post');
-const form = document.querySelector('#new-post form');
-const fetchButton = document.querySelector('#available-posts button');
-const postList = document.querySelector('ul');
+//=== http 요청 보내기 : fetch API ===
+
+const listElement = document.querySelector(".posts");
+const postTemplate = document.getElementById("single-post");
+const form = document.querySelector("#new-post form");
+const fetchButton = document.querySelector("#available-posts button");
+const postList = document.querySelector("ul");
 
 function sendHttpRequest(method, url, data) {
   // const promise = new Promise((resolve, reject) => {
@@ -31,10 +33,12 @@ function sendHttpRequest(method, url, data) {
   // });
 
   // return promise;
+  //] fetch
   return fetch(url, {
     method: method,
     // body: JSON.stringify(data),
-    body: data,
+    body: data, // formData
+    //-- http header에 내용 추가
     // headers: {
     //   'Content-Type': 'application/json'
     // }
@@ -45,28 +49,28 @@ function sendHttpRequest(method, url, data) {
       } else {
         return response.json().then((errData) => {
           console.log(errData);
-          throw new Error('Something went wrong - server-side.');
+          throw new Error("Something went wrong - server-side.");
         });
       }
     })
     .catch((error) => {
       console.log(error);
-      throw new Error('Something went wrong!');
+      throw new Error("Something went wrong!");
     });
 }
 
 async function fetchPosts() {
   try {
     const responseData = await sendHttpRequest(
-      'GET',
-      'https://jsonplaceholder.typicode.com/posts'
+      "GET",
+      "https://jsonplaceholder.typicode.com/posts",
     );
     const listOfPosts = responseData;
     for (const post of listOfPosts) {
       const postEl = document.importNode(postTemplate.content, true);
-      postEl.querySelector('h2').textContent = post.title.toUpperCase();
-      postEl.querySelector('p').textContent = post.body;
-      postEl.querySelector('li').id = post.id;
+      postEl.querySelector("h2").textContent = post.title.toUpperCase();
+      postEl.querySelector("p").textContent = post.body;
+      postEl.querySelector("li").id = post.id;
       listElement.append(postEl);
     }
   } catch (error) {
@@ -82,29 +86,31 @@ async function createPost(title, content) {
     userId: userId,
   };
 
+  //] FormData
+  // 생성자 함수
   const fd = new FormData(form);
-  // fd.append('title', title);
-  // fd.append('body', content);
-  fd.append('userId', userId);
+  // fd.append("title", title);
+  // fd.append("body", content);
+  fd.append("userId", userId);
 
-  sendHttpRequest('POST', 'https://jsonplaceholder.typicode.com/posts', fd);
+  sendHttpRequest("POST", "https://jsonplaceholder.typicode.com/posts", fd);
 }
 
-fetchButton.addEventListener('click', fetchPosts);
-form.addEventListener('submit', (event) => {
+fetchButton.addEventListener("click", fetchPosts);
+form.addEventListener("submit", (event) => {
   event.preventDefault();
-  const enteredTitle = event.currentTarget.querySelector('#title').value;
-  const enteredContent = event.currentTarget.querySelector('#content').value;
+  const enteredTitle = event.currentTarget.querySelector("#title").value;
+  const enteredContent = event.currentTarget.querySelector("#content").value;
 
   createPost(enteredTitle, enteredContent);
 });
 
-postList.addEventListener('click', (event) => {
-  if (event.target.tagName === 'BUTTON') {
-    const postId = event.target.closest('li').id;
+postList.addEventListener("click", (event) => {
+  if (event.target.tagName === "BUTTON") {
+    const postId = event.target.closest("li").id;
     sendHttpRequest(
-      'DELETE',
-      `https://jsonplaceholder.typicode.com/posts/${postId}`
+      "DELETE",
+      `https://jsonplaceholder.typicode.com/posts/${postId}`,
     );
   }
 });
