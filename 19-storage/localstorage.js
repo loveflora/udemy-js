@@ -5,12 +5,13 @@ const userId = 'u123';
 const user = {
   name: 'Max',
   age: 30,
-  hobbies: ['Sports', 'Cooking']
+  hobbies: ['Sports', 'Cooking'],
 };
 
 storeBtn.addEventListener('click', () => {
   sessionStorage.setItem('uid', userId);
   localStorage.setItem('user', JSON.stringify(user));
+  // localStorage.setItem(key, value);
 });
 
 retrBtn.addEventListener('click', () => {
